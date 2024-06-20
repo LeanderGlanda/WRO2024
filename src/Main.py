@@ -10,4 +10,5 @@ hub = PrimeHub(top_side=Axis.Z, front_side=Axis.Y)
 driveBase = DriveBase(Motor.left_motor, Motor.right_motor, wheel_diameter=51.5, axle_track=115)
 driveBase.use_gyro(True)
 
-gameRoutine()
+while True:
+    gameRoutine()

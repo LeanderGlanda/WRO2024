@@ -8,9 +8,9 @@ def enum(**enums: int):
 
 GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2)
 
+state = GameState.CALIBRATION
 
 def gameRoutine():
-    state = GameState.CALIBRATION
 
     if state == GameState.CALIBRATION:
         Functions.calibrateHolder()
@@ -20,8 +20,7 @@ def gameRoutine():
         return
 
     elif state == GameState.FIRSTBLOCKS_PICKUP:
-        # TODO: Move so we can drive straight at the blocks
-        Main.driveBase.curve(500, 20)
+        Main.driveBase.curve(500, 20) # This probably doesn't work out
         Functions.driveForwardToBlockAndPickUp(50, 1)
         for i in range(3):
             Functions.driveForwardToBlockAndPickUp(50, 1)
@@ -40,4 +39,4 @@ def gameRoutine():
 
         return 
 
-    return 0
+    return
