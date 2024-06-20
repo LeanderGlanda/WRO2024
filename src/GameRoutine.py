@@ -1,20 +1,18 @@
-from enum import Enum
-import Roboter.Functions
-import Roboter.Motor
-import Roboter.State
+import Functions
+import Motor
+import State
 
-class GameState(Enum):
-    CALIBRATION = 0
+def enum(**enums: int):
+    return type('Enum', (), enums)
+
+GameState = enum(CALIBRATION=0, TWO=2, THREE=3)
 
 
 def gameRoutine():
-
     state = GameState.CALIBRATION
 
-    match state:
-        case GameState.CALIBRATION:
-            Roboter.Functions.calibrateHolder()
-            Roboter.Functions.calibrateCarrier()
+    if state == GameState.CALIBRATION:
+            Functions.calibrateHolder()
+            Functions.calibrateCarrier()
 
     return 0
-
