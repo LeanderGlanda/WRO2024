@@ -5,9 +5,10 @@ from pybricks.robotics import DriveBase
 from pybricks.tools import wait, StopWatch
 import Motors
 
-hub = PrimeHub(top_side=Axis.Z, front_side=Axis.Y)
+hub = PrimeHub(top_side=-Axis.X, front_side=Axis.Z)
 
-driveBase = DriveBase(Motors.left_motor, Motors.right_motor, wheel_diameter=55.6, axle_track=115)
+driveBase = DriveBase(Motors.left_motor, Motors.right_motor, wheel_diameter=55.3, axle_track=102)
 driveBase.use_gyro(True)
-driveBase.settings(straight_acceleration=300)
-# print(driveBase.settings())
+#print(Roboter.driveBase.settings())
+
+bottomSensor = ColorSensor(Port.D)

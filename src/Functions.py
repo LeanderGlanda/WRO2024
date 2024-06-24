@@ -22,11 +22,11 @@ def calibrateCarrier():
     return
 
 def moveCarrier(heightToMove):
-    degressPerHeightFactor = 34 # 34 degress / mm
+    degressPerHeightFactor = 12 # 12 degress / mm
 
     rotationAngle = degressPerHeightFactor * heightToMove
 
-    Motors.carrier_motor.run_angle(-1000, rotationAngle, Stop.HOLD)
+    Motors.carrier_motor.run_angle(+1000, rotationAngle, Stop.HOLD)
     
     State.carrierHight += heightToMove
 
@@ -37,13 +37,60 @@ def moveCarrierByBlocks(blocksToMove):
     return
 
 # Carrier is above the blocks and should pick them up
-def pickUpBlocks():
+def pickUpBlocks(up = 23):
+    # Motors.pickup_motor.stop()
+    Motors.pickup_motor.dc(-5)
     moveCarrier(-State.carrierHight)
-    moveCarrier(20)
+    Motors.pickup_motor.dc(-50)
+    moveCarrier(up)
     return
 
-def driveForwardToBlockAndPickUp(distance, numOfBlocks):
+def driveForwardToBlockAndPickUp(distance, numOfBlocks, up=23):
     moveCarrierByBlocks(numOfBlocks)
     Roboter.driveBase.straight(distance)
-    pickUpBlocks()
+    pickUpBlocks(up)
     return
+
+def waitUntilColor(color):
+    while Roboter.bottomSensor.color() != color:
+        wait(5)
+
+def waitUntilHSVInRange(hLowerBound, hUpperBound, sLowerBound):
+    while Roboter.bottomSensor.hsv().h < hLowerBound or Roboter.bottomSensor.hsv().h > hUpperBound and Roboter.bottomSensor.hsv().s < sLowerBound:
+        wait(5)
+    print("Stopped at color: " + str(Roboter.bottomSensor.hsv()))
+
+def waitUntilColor(color):
+    while Roboter.bottomSensor.color() != color:
+        wait(5)
+
+def driveUntilColor(color):
+    Roboter.driveBase.drive(50,0)
+    while Roboter.bottomSensor.color() != color:
+        wait(5)
+    Roboter.driveBase.stop()
+    waitUntilDriveBaseDone()
+ 
+
+def driveFromStartingPositionToWall():
+    oldSettings = Roboter.driveBase.settings()
+    Roboter.driveBase.settings(straight_acceleration=400, straight_speed=400)
+    Roboter.driveBase.turn(-8)
+    Roboter.driveBase.straight(-400)
+    # we are relativly parallel to the wall now and far enough from the blocks
+    Motors.left_motor.dc(55)
+    Motors.right_motor.dc(30)
+    wait(500)
+    Motors.left_motor.dc(55)
+    Motors.right_motor.dc(50)
+    wait(750)
+    # waitUntilHSVInRange(340, 350, 65)
+    waitUntilColor(Color.WHITE)
+    Motors.left_motor.stop()
+    Motors.right_motor.stop()
+    Roboter.driveBase.settings(oldSettings[0], 100, oldSettings[2], oldSettings[3])
+
+def waitUntilDriveBaseDone():
+    while(Roboter.driveBase.state()[1]>5):
+        wait(10)
+        
