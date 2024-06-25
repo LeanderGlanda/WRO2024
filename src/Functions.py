@@ -26,20 +26,20 @@ def moveCarrier(heightToMove):
 
     rotationAngle = degressPerHeightFactor * heightToMove
 
-    Motors.carrier_motor.run_angle(+1000, rotationAngle, Stop.HOLD)
+    Motors.carrier_motor.run_angle(+750, rotationAngle, Stop.HOLD)
     
     State.carrierHight += heightToMove
 
     return
 
 def moveCarrierByBlocks(blocksToMove):
-    moveCarrier(blocksToMove*31)
+    moveCarrier(blocksToMove*34)
     return
 
 # Carrier is above the blocks and should pick them up
 def pickUpBlocks(up = 23):
     # Motors.pickup_motor.stop()
-    Motors.pickup_motor.dc(-5)
+    Motors.pickup_motor.dc(-10)
     moveCarrier(-State.carrierHight)
     Motors.pickup_motor.dc(-50)
     moveCarrier(up)
@@ -93,4 +93,16 @@ def driveFromStartingPositionToWall():
 def waitUntilDriveBaseDone():
     while(Roboter.driveBase.state()[1]>5):
         wait(10)
-        
+
+def releaseBlocks(countOfBlocks):
+    Motors.pickup_motor.dc(100)
+    wait(200)
+    Motors.pickup_motor.hold()
+    moveCarrierByBlocks(countOfBlocks)
+    Motors.pickup_motor.dc(-100)
+    wait(200)
+    Motors.pickup_motor.hold()
+    moveCarrier(10)
+
+def moveCarrierToAbsolutePosition(position):
+    moveCarrier(position-State.carrierHight)

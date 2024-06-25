@@ -8,7 +8,7 @@ from pybricks.parameters import Axis, Button, Color, Direction, Port, Side, Stop
 def enum(**enums: int):
     return type('Enum', (), enums)
 
-GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6)
+GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6, MOVETOSECONDBLOCKS=7)
 state = GameState.CALIBRATION
 # state = GameState.TEST
 
@@ -18,7 +18,10 @@ def gameRoutine():
     global state
 
     if state == GameState.TEST:
-        # Roboter.driveBase.turn(-360)
+        Roboter.driveBase.turn(-135)
+        Roboter.driveBase.straight(-800)
+        Roboter.driveBase.turn(30)
+        Functions.driveFromStartingPositionToWall()
         state = GameState.DEAD
         return
 
@@ -33,7 +36,7 @@ def gameRoutine():
         Functions.driveFromStartingPositionToWall()
         Functions.moveCarrier(20)
         Functions.driveUntilColor(Color.RED)
-        Roboter.driveBase.straight(38) # Mit schwachem Akku 37, aufgeladen 36
+        Roboter.driveBase.straight(38) # Mit schwachem Akku 38, aufgeladen 37
         state=GameState.FIRSTBLOCKS_PICKUP
         return
 
@@ -59,6 +62,18 @@ def gameRoutine():
         Roboter.driveBase.turn(90)
         Roboter.driveBase.straight(175)
 
+        Functions.releaseBlocks(2)
+        Roboter.driveBase.straight(-150)
+        Functions.moveCarrierToAbsolutePosition(15)
+
+        state=GameState.MOVETOSECONDBLOCKS
+        return
+    
+    elif state == GameState.MOVETOSECONDBLOCKS:
+        Roboter.driveBase.turn(-135)
+        Roboter.driveBase.straight(-800)
+        Roboter.driveBase.turn(30)
+        Functions.driveFromStartingPositionToWall()
         state=GameState.FIRSTBLOCKS_READCOLOURS
         return
     
