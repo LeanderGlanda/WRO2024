@@ -13,4 +13,4 @@ driveBase.use_gyro(True)
 
 bottomSensor = ColorSensor(Port.D)
 
-holdDutyCycle = 70
+holdDutyCycle = -70

@@ -103,8 +103,8 @@ def waitUntilDriveBaseDone():
 
 def releaseBlocks(countOfBlocks):
     Motors.pickup_motor.dc(100)
-    wait(200)
-    Motors.pickup_motor.hold()
+    # wait(200)
+    # Motors.pickup_motor.hold()
     moveCarrierByBlocks(countOfBlocks)
     Motors.pickup_motor.dc(-100)
     wait(200)
