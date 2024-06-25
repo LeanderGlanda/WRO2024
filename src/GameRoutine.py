@@ -8,7 +8,7 @@ from pybricks.parameters import Axis, Button, Color, Direction, Port, Side, Stop
 def enum(**enums: int):
     return type('Enum', (), enums)
 
-GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6, MOVETOSECONDBLOCKS=7)
+GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6, MOVETOSECONDBLOCKS=7, SECONDBLOCKS_PICKUPRED=8, SECONDBLOCKS_PUTRED=9)
 state = GameState.CALIBRATION
 # state = GameState.TEST
 
@@ -18,10 +18,9 @@ def gameRoutine():
     global state
 
     if state == GameState.TEST:
-        Roboter.driveBase.turn(-135)
-        Roboter.driveBase.straight(-800)
-        Roboter.driveBase.turn(30)
-        Functions.driveFromStartingPositionToWall()
+        Motors.pickup_motor.dc(100)
+        wait(5000)
+        Motors.pickup_motor.hold()
         state = GameState.DEAD
         return
 
@@ -41,14 +40,14 @@ def gameRoutine():
         return
 
     elif state == GameState.FIRSTBLOCKS_PICKUP:
-        Motors.pickup_motor.dc(-50)
-        Functions.pickUpBlocks()
+        Motors.pickup_motor.dc(Roboter.holdDutyCycle)
+        Functions.pickUpBlocks(downDuty=40)
         
         for i in range(2):
             Functions.driveForwardToBlockAndPickUp(100, 1)
         Functions.driveForwardToBlockAndPickUp(100, 1, 13)
         wait(1000)
-        Motors.pickup_motor.hold()
+        # Motors.pickup_motor.hold()
         state=GameState.FIRSTBLOCKS_PUTYELLOW
         return
     
@@ -70,12 +69,48 @@ def gameRoutine():
         return
     
     elif state == GameState.MOVETOSECONDBLOCKS:
+        Motors.pickup_motor.dc(Roboter.holdDutyCycle)
         Roboter.driveBase.turn(-135)
-        Roboter.driveBase.straight(-800)
-        Roboter.driveBase.turn(30)
+        Roboter.driveBase.straight(-950)
+        Roboter.driveBase.turn(45)
+        Roboter.driveBase.straight(100)
         Functions.driveFromStartingPositionToWall()
-        state=GameState.FIRSTBLOCKS_READCOLOURS
+        Functions.moveCarrier(50)
+        Functions.driveUntilColor(Color.RED)
+        # Auf dieser Seite ist der Abstand von der roten Außenline zum roten Block etwas größer. Um 1-2 mm
+        Roboter.driveBase.straight(39)
+        state=GameState.SECONDBLOCKS_PICKUPRED
         return
+    
+    elif state == GameState.SECONDBLOCKS_PICKUPRED:
+        Motors.pickup_motor.dc(Roboter.holdDutyCycle)
+        Functions.pickUpBlocks()
+        Functions.driveForwardToBlockAndPickUp(100, 1, 13)
+        wait(1000)
+        Motors.pickup_motor.hold()
+        state=GameState.SECONDBLOCKS_PUTRED
+        return
+    
+    elif state == GameState.SECONDBLOCKS_PUTRED:
+        # We picked up the first 4 blocks and now want to bring the two yellow ones to the middle.
+        Roboter.driveBase.turn(-90)
+        # Maybe wait "So long bis da Roboter de scheiß Wand berührt"
+        Roboter.driveBase.straight(300)
+        Roboter.driveBase.turn(90)
+        Roboter.driveBase.straight(100)
+        Functions.driveUntilColor(Color.NONE, speed=50)
+        Functions.driveUntilColor(Color.RED)
+        Roboter.driveBase.straight(120)
+        Roboter.driveBase.turn(-90)
+        Roboter.driveBase.straight(120)
+
+        Functions.releaseBlocks(4)
+        Roboter.driveBase.straight(-150)
+        Functions.moveCarrierToAbsolutePosition(15)
+
+        state=GameState.DEAD
+        return
+
     
     elif state == GameState.FIRSTBLOCKS_READCOLOURS:
         # Drive left so that we stand in line with the green / blue blocks with the colour sensor

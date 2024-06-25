@@ -12,3 +12,5 @@ driveBase.use_gyro(True)
 #print(Roboter.driveBase.settings())
 
 bottomSensor = ColorSensor(Port.D)
+
+holdDutyCycle = 70
