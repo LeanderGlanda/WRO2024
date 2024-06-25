@@ -8,7 +8,7 @@ from pybricks.parameters import Axis, Button, Color, Direction, Port, Side, Stop
 def enum(**enums: int):
     return type('Enum', (), enums)
 
-GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6, MOVETOSECONDBLOCKS=7, SECONDBLOCKS_PICKUPRED=8, SECONDBLOCKS_PUTRED=9, DRIVETOOTHERFIELD=10)
+GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6, MOVETOSECONDBLOCKS=7, SECONDBLOCKS_PICKUPRED=8, SECONDBLOCKS_PUTRED=9, DRIVETOOTHERFIELD=10, BRINGTRASHTOAREA=11)
 # state = GameState.CALIBRATION
 state = GameState.DRIVETOOTHERFIELD
 
@@ -28,7 +28,7 @@ def gameRoutine():
         return
 
     if state == GameState.CALIBRATION:
-        Functions.moveCarrier(20)
+        Functions.moveCarrierToAbsolutePosition(40)
         Functions.calibrateHolder()
         # Functions.calibrateCarrier()
         state=GameState.MOVETOFIRSTBLOCKS
@@ -36,21 +36,23 @@ def gameRoutine():
     
     elif state == GameState.MOVETOFIRSTBLOCKS:
         Functions.driveFromStartingPositionToWall()
-        Functions.moveCarrier(20)
         Functions.driveUntilColor(Color.RED)
-        Roboter.driveBase.straight(38) # Mit schwachem Akku 38, aufgeladen 37
+        Roboter.driveBase.straight(38) # Mit schwachem Akku 38, aufgeladen 37 -> eventuell, 38 ist eigentlich eher korrekt auch aufgeladen
         state=GameState.FIRSTBLOCKS_PICKUP
         return
 
     elif state == GameState.FIRSTBLOCKS_PICKUP:
-        Motors.pickup_motor.dc(Roboter.holdDutyCycle)
+        Functions.activelyHoldBlocks()
+
+        # Picking up the first block requires a lot of force, as the holder needs to be wideend
         Functions.pickUpBlocks(downDuty=40)
         
         for i in range(2):
             Functions.driveForwardToBlockAndPickUp(100, 1)
         Functions.driveForwardToBlockAndPickUp(100, 1, 13)
+
+        # This wait may be unnecessary
         wait(1000)
-        # Motors.pickup_motor.hold()
         state=GameState.FIRSTBLOCKS_PUTYELLOW
         return
     
@@ -58,6 +60,17 @@ def gameRoutine():
         # We picked up the first 4 blocks and now want to bring the two yellow ones to the middle.
         Roboter.driveBase.turn(-90)
         # Maybe wait "So long bis da Roboter de scheiß Wand berührt"
+        # We could defenitely accelerate here and drive in an angle
+        # Maybe this works:
+        # oldSettings = Functions.setHighSpeed()
+        # Roboter.driveBase.straight(50)
+        # Roboter.driveBase.turn(-21)
+        # Roboter.driveBase.straight(316)
+        # Roboter.driveBase.turn(21)
+        # Roboter.driveBase.straight(75) # Calculated 80 but could be too far because of rounding.
+        # Functions.setNormalSpeed(oldSettings)
+
+        # Otherwise: This works:
         Roboter.driveBase.straight(250)
         Roboter.driveBase.turn(-90)
         Roboter.driveBase.straight(115)
@@ -65,6 +78,7 @@ def gameRoutine():
         Roboter.driveBase.straight(175)
 
         Functions.releaseBlocks(2)
+        Functions.activelyHoldBlocks()
         Roboter.driveBase.straight(-150)
         Functions.moveCarrierToAbsolutePosition(15)
 
@@ -72,35 +86,41 @@ def gameRoutine():
         return
     
     elif state == GameState.MOVETOSECONDBLOCKS:
-        Motors.pickup_motor.dc(Roboter.holdDutyCycle)
         Roboter.driveBase.turn(-135)
+        oldSettings = Functions.setHighSpeed()
         Roboter.driveBase.straight(-950)
         Roboter.driveBase.turn(45)
         Roboter.driveBase.straight(100)
+        Functions.setNormalSpeed(oldSettings)
+
+        # Now we are at the second starting position, just drive the same manuver as at the start of the game to the wall
         Functions.driveFromStartingPositionToWall()
         Functions.moveCarrier(50)
         Functions.driveUntilColor(Color.RED)
-        # Auf dieser Seite ist der Abstand von der roten Außenline zum roten Block etwas größer. Um 1-2 mm
+        # On this side the distance from the red outline to the block outline is 1-2mm larger than on the other side.
         Roboter.driveBase.straight(39)
         state=GameState.SECONDBLOCKS_PICKUPRED
         return
     
     elif state == GameState.SECONDBLOCKS_PICKUPRED:
-        Motors.pickup_motor.dc(Roboter.holdDutyCycle)
+        Functions.activelyHoldBlocks()
+        # In this situation where 2 red blocks are stored in the carrier, it takes a lot of force to take this 3rd block.
         Functions.pickUpBlocks(downDuty=40)
         Functions.driveForwardToBlockAndPickUp(100, 1, 13)
+        # This wait is probably unnecesarry
         wait(1000)
         Motors.pickup_motor.hold()
         state=GameState.SECONDBLOCKS_PUTRED
         return
     
     elif state == GameState.SECONDBLOCKS_PUTRED:
-        # We picked up the first 4 blocks and now want to bring the two yellow ones to the middle.
         Roboter.driveBase.turn(-90)
         # Maybe wait "So long bis da Roboter de scheiß Wand berührt"
+        oldSettings = Functions.setHighSpeed()
         Roboter.driveBase.straight(300)
         Roboter.driveBase.turn(90)
         Roboter.driveBase.straight(100)
+        Functions.setNormalSpeed(oldSettings)
         Functions.driveUntilColor(Color.NONE, speed=50)
         Functions.driveUntilColor(Color.RED)
         Roboter.driveBase.straight(120)
@@ -111,15 +131,18 @@ def gameRoutine():
         Roboter.driveBase.straight(-150)
         Functions.moveCarrierToAbsolutePosition(15)
 
-        # Trümmerteil
+        state=GameState.BRINGTRASHTOAREA
+        return
+
+    elif state == GameState.BRINGTRASHTOAREA:
 
         Roboter.driveBase.turn(45)
-        Roboter.driveBase.settings(straight_acceleration=400, straight_speed=800)
+        oldSettings = Functions.setHighSpeed()
         Roboter.driveBase.straight(800)
+        Functions.setNormalSpeed(oldSettings)
 
         state=GameState.DEAD
         return
-
     
     elif state == GameState.FIRSTBLOCKS_READCOLOURS:
         # Drive left so that we stand in line with the green / blue blocks with the colour sensor

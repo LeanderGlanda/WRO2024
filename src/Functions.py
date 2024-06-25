@@ -74,11 +74,9 @@ def driveUntilColor(color, speed=50):
  
 
 def driveFromStartingPositionToWall():
-    oldSettings = Roboter.driveBase.settings()
-    Roboter.driveBase.settings(straight_acceleration=400, straight_speed=400)
+    oldSettings = setHighSpeed()
     Roboter.driveBase.turn(-20)
     Roboter.driveBase.straight(-200)
-    # we are relativly parallel to the wall now and far enough from the blocks
     Motors.left_motor.dc(-40)
     Motors.right_motor.dc(-50)
     wait(600)
@@ -88,14 +86,13 @@ def driveFromStartingPositionToWall():
     Motors.left_motor.dc(-45)
     Motors.right_motor.dc(-40)
     wait(1000)
-    Motors.left_motor.dc(65)
-    Motors.right_motor.dc(60)
+    Motors.left_motor.dc(45)
+    Motors.right_motor.dc(40)
     wait(600)
-    # waitUntilHSVInRange(340, 350, 65)
     waitUntilColor(Color.WHITE)
     Motors.left_motor.stop()
     Motors.right_motor.stop()
-    Roboter.driveBase.settings(oldSettings[0], 100, oldSettings[2], oldSettings[3])
+    setNormalSpeed(oldSettings)
 
 def waitUntilDriveBaseDone():
     while(Roboter.driveBase.state()[1]>5):
@@ -113,3 +110,14 @@ def releaseBlocks(countOfBlocks):
 
 def moveCarrierToAbsolutePosition(position):
     moveCarrier(position-State.carrierHight)
+
+def activelyHoldBlocks():
+    Motors.pickup_motor.dc(Roboter.holdDutyCycle)
+
+def setHighSpeed():
+    oldSettings = Roboter.driveBase.settings()
+    Roboter.driveBase.settings(straight_acceleration=800, straight_speed=400)
+    return oldSettings
+
+def setNormalSpeed(oldSettings):
+    Roboter.driveBase.settings(oldSettings[0], 100, oldSettings[2], oldSettings[3])
