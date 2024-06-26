@@ -9,7 +9,7 @@ def enum(**enums: int):
     return type('Enum', (), enums)
 
 GameState = enum(CALIBRATION=0, FIRSTBLOCKS_PICKUP=1, FIRSTBLOCKS_READCOLOURS=2, DEAD=3, TEST=4, MOVETOFIRSTBLOCKS=5, FIRSTBLOCKS_PUTYELLOW=6, MOVETOSECONDBLOCKS=7, SECONDBLOCKS_PICKUPRED=8, SECONDBLOCKS_PUTRED=9, DRIVETOOTHERFIELD=10, BRINGTRASHTOAREA=11, TREE=12)
-# state = GameState.CALIBRATION
+# state = GameState.MOVETOFIRSTBLOCKS
 state = GameState.DRIVETOOTHERFIELD
 # state = GameState.TEST
 
@@ -19,19 +19,17 @@ def gameRoutine():
     global state
 
     if state == GameState.TEST:
-        print("Stopped at color: " + str(Roboter.bottomSensor.hsv()))
-        # Functions.calibrateHolder()
-        # Functions.activelyHoldBlocks()
-
-        state = GameState.DEAD
+        Roboter.driveBase.drive(50, 0)
+        print("Color: " + str(Roboter.bottomSensor.hsv()))
+        wait(200)
         return
 
     if state == GameState.DRIVETOOTHERFIELD:
         Functions.moveCarrier(20)
-        Roboter.driveBase.turn(-35)
+        Roboter.driveBase.turn(-40)
         Roboter.driveBase.settings(straight_acceleration=800, straight_speed=800)
-        Roboter.driveBase.straight(-1400)
-        Roboter.driveBase.turn(35)
+        Roboter.driveBase.straight(-1320)
+        Roboter.driveBase.turn(40)
         Roboter.driveBase.straight(150)
         state = GameState.CALIBRATION
         return
@@ -47,10 +45,10 @@ def gameRoutine():
         Functions.driveFromStartingPositionToWall()
         # Functions.driveUntilColor(Color.RED)
         Roboter.driveBase.drive(50,0)
-        Functions.waitUntilHSVInRange(345, 360, 20)
+        Functions.waitUntilHSVInRange(335, 345, 35)
         Roboter.driveBase.stop()
         Functions.waitUntilDriveBaseDone()
-        Roboter.driveBase.straight(49) # Mit schwachem Akku 38, aufgeladen 37 -> eventuell, 38 ist eigentlich eher korrekt auch aufgeladen
+        Roboter.driveBase.straight(51) # Mit schwachem Akku 38, aufgeladen 37 -> eventuell, 38 ist eigentlich eher korrekt auch aufgeladen
         state=GameState.FIRSTBLOCKS_PICKUP
         return
 
@@ -77,9 +75,9 @@ def gameRoutine():
         # Maybe this works:
         oldSettings = Functions.setHighSpeed()
         Roboter.driveBase.straight(50)
-        Roboter.driveBase.turn(-21)
-        Roboter.driveBase.straight(316)
-        Roboter.driveBase.turn(21)
+        Roboter.driveBase.turn(-23)
+        Roboter.driveBase.straight(326)
+        Roboter.driveBase.turn(23)
         Roboter.driveBase.straight(75) # Calculated 80 but could be too far because of rounding.
         Functions.setNormalSpeed(oldSettings)
 
@@ -101,7 +99,7 @@ def gameRoutine():
     elif state == GameState.MOVETOSECONDBLOCKS:
         Roboter.driveBase.turn(-135)
         oldSettings = Functions.setHighSpeed()
-        Roboter.driveBase.straight(-950)
+        Roboter.driveBase.straight(-920)
         Roboter.driveBase.turn(45)
         Roboter.driveBase.straight(100)
         Functions.setNormalSpeed(oldSettings)
@@ -138,7 +136,7 @@ def gameRoutine():
         oldSettings = Functions.setHighSpeed()
         Roboter.driveBase.straight(300)
         Roboter.driveBase.turn(90)
-        Roboter.driveBase.straight(425)
+        Roboter.driveBase.straight(475)
         # Functions.driveUntilColor(Color.BLACK, speed=50)
 
         # Roboter.driveBase.drive(50,0)
@@ -149,7 +147,7 @@ def gameRoutine():
 
         # Functions.driveUntilColor(Color.RED)
         Roboter.driveBase.turn(-90)
-        Roboter.driveBase.straight(220)
+        Roboter.driveBase.straight(150)
         Functions.setNormalSpeed(oldSettings)
 
         Functions.releaseBlocks(4)

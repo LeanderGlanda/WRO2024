@@ -32,8 +32,8 @@ def moveCarrier(heightToMove):
 
     return
 
-def moveCarrierByBlocks(blocksToMove):
-    moveCarrier(blocksToMove*32 + 3)
+def moveCarrierByBlocks(blocksToMove, factor=36):
+    moveCarrier(blocksToMove*factor)
     return
 
 # Carrier is above the blocks and should pick them up
@@ -91,7 +91,7 @@ def driveFromStartingPositionToWall():
     wait(1000)
     Motors.left_motor.dc(40)
     Motors.right_motor.dc(30)
-    wait(200)
+    wait(400)
     waitUntilColor(Color.WHITE)
     Motors.left_motor.stop()
     Motors.right_motor.stop()
@@ -105,7 +105,8 @@ def releaseBlocks(countOfBlocks):
     Motors.pickup_motor.dc(100)
     wait(200)
     Motors.pickup_motor.hold()
-    moveCarrierByBlocks(countOfBlocks)
+    # moveCarrierByBlocks(countOfBlocks, 33)
+    moveCarrierToAbsolutePosition(countOfBlocks*33+5)
     Motors.pickup_motor.dc(-100)
     wait(200)
     Motors.pickup_motor.hold()
