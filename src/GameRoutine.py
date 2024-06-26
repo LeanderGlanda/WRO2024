@@ -28,7 +28,7 @@ def gameRoutine():
         Functions.moveCarrier(20)
         Roboter.driveBase.turn(-40)
         Roboter.driveBase.settings(straight_acceleration=800, straight_speed=800)
-        Roboter.driveBase.straight(-1320)
+        Roboter.driveBase.straight(-1310)
         Roboter.driveBase.turn(40)
         Roboter.driveBase.straight(150)
         state = GameState.CALIBRATION
@@ -99,7 +99,7 @@ def gameRoutine():
     elif state == GameState.MOVETOSECONDBLOCKS:
         Roboter.driveBase.turn(-135)
         oldSettings = Functions.setHighSpeed()
-        Roboter.driveBase.straight(-920)
+        Roboter.driveBase.straight(-935)
         Roboter.driveBase.turn(45)
         Roboter.driveBase.straight(100)
         Functions.setNormalSpeed(oldSettings)
@@ -147,7 +147,7 @@ def gameRoutine():
 
         # Functions.driveUntilColor(Color.RED)
         Roboter.driveBase.turn(-90)
-        Roboter.driveBase.straight(150)
+        Roboter.driveBase.straight(120)
         Functions.setNormalSpeed(oldSettings)
 
         Functions.releaseBlocks(4)
@@ -161,7 +161,7 @@ def gameRoutine():
 
         Roboter.driveBase.turn(45)
         oldSettings = Functions.setHighSpeed()
-        Roboter.driveBase.straight(850)
+        Roboter.driveBase.straight(900)
         Functions.setNormalSpeed(oldSettings)
 
         state=GameState.TREE
@@ -170,18 +170,19 @@ def gameRoutine():
     elif state == GameState.TREE:
         oldSettings = Functions.setHighSpeed()
         # 90mm zurück, drehen, von drehachse 260mm nach vorn -> länge von drehachse zu greifermittelpunkt abziehen
-        Roboter.driveBase.straight(-50)
+        Roboter.driveBase.straight(-100)
         Roboter.driveBase.turn(135)
         Motors.left_motor.dc(-60)
         Motors.right_motor.dc(-60)
-        wait(400)
+        wait(800)
         Motors.left_motor.hold()
         Motors.right_motor.hold()
-        Roboter.driveBase.straight(120)
+        wait(500)
+        Roboter.driveBase.straight(110)
         Roboter.driveBase.turn(-90)
         Functions.driveUntilColor(Color.WHITE, -50)
         Functions.moveCarrierToAbsolutePosition(100)
-        Roboter.driveBase.straight(390)
+        Roboter.driveBase.straight(410)
         Motors.pickup_motor.dc(-100)
         wait(200)
         Motors.pickup_motor.hold()
