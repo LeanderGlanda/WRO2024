@@ -33,11 +33,11 @@ def moveCarrier(heightToMove):
     return
 
 def moveCarrierByBlocks(blocksToMove):
-    moveCarrier(blocksToMove*36)
+    moveCarrier(blocksToMove*32 + 3)
     return
 
 # Carrier is above the blocks and should pick them up
-def pickUpBlocks(up = 23, downDuty=-10):
+def pickUpBlocks(up = 23, downDuty=10):
     # Motors.pickup_motor.stop()
     Motors.pickup_motor.dc(downDuty)
     moveCarrier(-State.carrierHight)
@@ -64,13 +64,16 @@ def waitUntilHSVInRange(hLowerBound, hUpperBound, sLowerBound):
 def waitUntilColor(color):
     while Roboter.bottomSensor.color() != color:
         wait(5)
+    print("Stopped at color: " + str(Roboter.bottomSensor.hsv()))
 
 def driveUntilColor(color, speed=50):
     Roboter.driveBase.drive(speed,0)
     while Roboter.bottomSensor.color() != color:
         wait(5)
+    print("Stopped at color: " + str(Roboter.bottomSensor.hsv()))
     Roboter.driveBase.stop()
     waitUntilDriveBaseDone()
+
  
 
 def driveFromStartingPositionToWall():
@@ -86,9 +89,9 @@ def driveFromStartingPositionToWall():
     Motors.left_motor.dc(-45)
     Motors.right_motor.dc(-40)
     wait(1000)
-    Motors.left_motor.dc(45)
-    Motors.right_motor.dc(40)
-    wait(600)
+    Motors.left_motor.dc(40)
+    Motors.right_motor.dc(30)
+    wait(200)
     waitUntilColor(Color.WHITE)
     Motors.left_motor.stop()
     Motors.right_motor.stop()
@@ -100,8 +103,8 @@ def waitUntilDriveBaseDone():
 
 def releaseBlocks(countOfBlocks):
     Motors.pickup_motor.dc(100)
-    # wait(200)
-    # Motors.pickup_motor.hold()
+    wait(200)
+    Motors.pickup_motor.hold()
     moveCarrierByBlocks(countOfBlocks)
     Motors.pickup_motor.dc(-100)
     wait(200)
